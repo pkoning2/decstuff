@@ -7,3 +7,4 @@ to DEC and its products.
 Current contents:
 * Fonts
 * TECO
+* DECnet/E related items
