@@ -1,0 +1,123 @@
+Software DDCMP in RSTS/E V10
+
+NODVR, a software DDCMP driver was written for V9.6 as part of PRO
+support (an unreleased and unsanctioned effort).  In V10.0 it was made
+part of the released product.  These notes were reverse engineered
+from the V10.1 code, though it is likely they are valid also for
+V10.0.
+
+NODVR is an "auxiliary driver", essentially a software coprocessor for
+a standard device.  In this case, it is associated with a terminal
+line, and hooks to the terminal driver to become an alternate
+character processor.  Any physical terminal port other than the
+console can be operated in DDCMP mode, but the PRO display,
+pseudo-keyboards, and LAT terminals cannot.
+
+Unlike other DDCMP devices, NODVR does not support use from
+application programs.  It can only be used as a DECnet data link.
+
+Enabling NODVR support in RSTS.
+
+While the software is built into the OS during SYSGEN, it is not
+loaded unless enabled by a flag in the system configuration file
+[0,1]CONFIG.SYS.  To set this flag:
+
+   $ set system/async
+
+The change will take effect after a system reboot.  You can use "show
+system" to confirm that the software DDCMP driver is loaded.
+
+Starting DDCMP on a terminal line.
+
+Running the DDCMP driver on a given terminal line is a two step
+process.  The first step enables DDCMP mode by binding an NODVR unit
+to the terminal line.  The second step starts the DDCMP state machine
+for that unit. 
+
+1. Set DDCMP mode for a terminal
+
+Before this is done, either the terminal line must be not owned, or it
+must be owned (assigned) by the requesting job.
+
+To enable DDCMP mode for a given terminal line, issue this DCL
+command:
+	$ set term kb<x>/proto=ddcmp
+
+Alternatively in a program, open NO0: and issue a .SPEC request with the
+following arguments:
+	  XRB: 3 (Function code: set DDCMP mode)
+	  XRBC: Terminal unit number to set to DDCMP mode
+
+On successful completion, the terminal line is now associated with the
+DDCMP driver.  As part of this, an NO<x>: DDB has been created, where
+<x> is the terminal line unit number specified.  The terminal line is
+now marked as owned by DECnet (owner job appears as "TRN" in the SHOW
+DEVICES/ALLOC command).
+
+2. Start DDCMP circuit
+
+Issue a DECnet circuit start request, which is a .MESAG with the
+following arguments:
+	FQFIL  = -21 (Function code: circuit control)
+	FQSIZM = 3 (Subfunction: circuit on)
+	FQ$MFL = Routing circuit flags  [11]
+		 LF.VER	==> Verification required
+		 LF.ANS	==> Answer mode
+		 LF.RST	==> Restartable  (512)
+		 LF.TRA	==> Trace for this circuit
+	FQNAM1 = Originating queue limit [7]
+	FQNAM1+2 = Recall timer [9]
+	FQBUFL = Hello timer interval [15]
+	FQMODE = Operational mode (see below) [17]
+	FQFLAG = Circuit cost [19]
+	FQ$CTM = Counter timer [21]
+	FQDEV,
+	FQDEVN = Device to use ("TT" in FQDEV, <x> in FQDEVN) [23..26]
+	FQCLUS = Buffer quota (byte) [27]
+
+Numbers in [ ] indicate character positions in the Basic-PLUS syscall.
+
+FQMODE bit 14 (8192) set indicates a request for sync mode.  This is
+only valid on a PRO, and then only for the terminal line corresponding
+to the communication port.  No other mode bits apply to the async DDMP
+driver. 
+
+Make sure the XRB is zeroed since this is not a data transferring case
+of .MESAG.  Note that the device name is given as "TT" not "KB" or
+"NO"; the DECnet circuit start code recognizes this name as a special
+case. 
+
+Stopping DDCMP
+
+This involves the reverse of the two steps given above.
+
+1. Stop DDCMP circuit
+
+Issue a DECnet circuit stop request, which is a .MESAG with the
+following arguments:
+	FQFIL  = -21 (Function code: circuit control)
+	FQSIZM = 4 (Subfunction: circuit off)
+	FQDEV,
+	FQDEVN = Device to use ("TT" in FQDEV, <x> in FQDEVN)
+	
+Make sure the XRB is zeroed since this is not a data transferring case
+of .MESAG.  Note that the device name is given as "TT" not "KB" or
+"NO"; the DECnet circuit start code recognizes this name as a special
+case. 
+
+2. Disable DDCMP mode for the terminal line
+
+To return the terminal line that was used to normal operation rather
+than being bound to the Async DDCMP driver, use the DCL command:
+
+	$ set term kb<x>/proto=none
+
+Alternatively in a program, open NO0: and issue a .SPEC request with the
+following arguments:
+	  XRB: 4 (Function code: set normal mode)
+	  XRBC: Terminal unit number to revert to normal mode
+
+On successful completion, the terminal line is no longer associated
+with the DDCMP driver.  Any resources allocated for DDCMP mode have
+been freed.  Ownership of the terminal line is returned to what it was
+before DDCMP mode was set.

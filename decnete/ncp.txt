@@ -1,0 +1,59 @@
+Using terminal lines as DECnet circuits using async DDCMP
+
+Software DDCMP over RSTS terminal lines was written for V9.6 as part
+of PRO support (an unreleased and unsanctioned effort).  In V10.0 it
+was made part of the released product.  These notes apply to V10.1.
+It is possible they will work on V10.0.  I don't have a system to test
+that, feedback would be welcome.
+
+These notes describe how NCP (the version in this repository) supports
+the use of terminal lines with async DDCMP as DECnet circuits.
+
+NCP knows terminal circuits as circuit (or line) names TT-n where n is
+an integer between 1 and 15.  While RSTS supports higher unit numbers,
+the DECnet/E database format does not have records allocated for
+those.  It would be possible to change that, but I have not done the
+extra work and conversion needed.
+
+Before terminal circuits are available for DECnet, you need two
+preliminary steps.
+
+1. Enabling NODVR support in RSTS.
+
+While the software is built into the OS during SYSGEN, it is not
+loaded unless enabled by a flag in the system configuration file
+[0,1]CONFIG.SYS.  To set this flag:
+
+   $ set system/async
+
+The change will take effect after a system reboot.  You can use "show
+system" to confirm that the software DDCMP driver is loaded.  This
+step is needed only once, it is persistent once set.
+
+2. Setting DDCMP mode on a terminal line.
+
+Before this is done, either the terminal line must be not owned, or it
+must be owned (assigned) by the requesting job.
+
+To enable DDCMP mode for a given terminal line, issue this DCL
+command:
+	$ set term kb<x>/proto=ddcmp
+
+To return the terminal line that was used to normal operation rather
+than being bound to the Async DDCMP driver, use the DCL command:
+
+	$ set term kb<x>/proto=none
+
+3. NCP support
+
+Lines and circuits TT-1 through TT-15 can be defined in the permanent
+database with the DEFINE command, and displayed with the LIST
+command.  These commands are always available.
+
+The corresponding operations on the active system, SET and SHOW, are
+only valid on KB units that have been set into DDCMP mode as shown
+above.   The parameters that can be set, the status that is displayed,
+and the counters you can see, are roughly those of the familiar DMC-11
+devices (circuit name DMC-n or DMR-n).  The counters are slightly
+different, they were designed to match more closely what the DECnet
+architecture spec calls for.
