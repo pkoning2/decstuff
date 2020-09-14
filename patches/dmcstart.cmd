@@ -1,7 +1,7 @@
-; Fix DMC startup problem (buffers assigned before startup done)
-; in RSTS 9.2.  (This bug was fixed in RSTS 9.3.)
-;
-; This is a Monitor patch
+! Fix DMC startup problem (buffers assigned before startup done)
+! in RSTS 9.2.  (This bug was fixed in RSTS 9.3.)
+!
+! This is a Monitor patch
 File to patch? <LF>
 Module name? XVR
 Base address? XMDVRM

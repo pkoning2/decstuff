@@ -1,8 +1,8 @@
-; Fix invalid address in point to point hello messages introduced
-; in RSTS 9.6 (or possibly earlier), DECnet/E V4.x.
-;
-; This is a Monitor patch
-;
+! Fix invalid address in point to point hello messages introduced
+! in RSTS 9.6 (or possibly earlier), DECnet/E V4.x.
+!
+! This is a Monitor patch
+!
 File to patch? <LF>
 Enter the name of the module in the SIL to be patched: TRN
 Base address? ROUDDC@OVR

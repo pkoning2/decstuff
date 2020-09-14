@@ -1,10 +1,10 @@
-; Patch to fix incorrect display of DMR line card configuration
-; in HARDWARE LIST option.
-;
-; This patch is for RSTS 10.1.
-;
-; Paul Koning, 19-Aug-2016
-;
+! Patch to fix incorrect display of DMR line card configuration
+! in HARDWARE LIST option.
+!
+! This patch is for RSTS 10.1.
+!
+! Paul Koning, 19-Aug-2016
+!
 File to patch? INIT.SYS
 Base address? HAR
 Offset address? 6166
