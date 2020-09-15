@@ -4,7 +4,7 @@
 ! This is a Monitor patch
 !
 File to patch? <LF>
-Enter the name of the module in the SIL to be patched: TRN
+Module name? TRN
 Base address? ROUDDC@OVR
 Offset address? 4224
  Base	Offset  Old     New?
