@@ -2957,9 +2957,12 @@ class outputstream (object):
         if self.outfile:
             raise OFO (self.teco)
         fn = os.path.expanduser (fn)
+        fdir = os.path.dirname (os.path.abspath (fn))
         if scheck and not fn.lower ().endswith (".tmp") and os.path.isfile (fn):
             print('%%Superseding existing file "%s"' % fn)
-        fd, self.tempfn = tempfile.mkstemp (text = True)
+        # Put the tempfile in the output directory so we don't end up
+        # with cross-mountpath issues.
+        fd, self.tempfn = tempfile.mkstemp (text = True, dir = fdir)
         try:
             self.outfile = open (fd, "wt", encoding = "utf8", errors = "ignore")
             self.teco.lastfilename = fn
