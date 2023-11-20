@@ -9,3 +9,4 @@ Current contents:
 * TECO
 * DECnet/E related items
 * Patches (ONLPAT command files to patch various known bugs)
+* NTP (RSTS NTP protocol client)

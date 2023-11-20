@@ -1,0 +1,21 @@
+.TITLE	NTOH SUPPORT FOR DEC C
+
+	.PSECT	$CODEI,RO,I,LCL,REL,CON
+
+; The DEC C RTL manual says that R1 is the (only) register the
+; function doesn't have to save.
+
+NTOHL::	MOV	8.(SP),R1	; Low half
+	SWAB	R1
+	MOV	R1,2(SP)
+	MOV	6(SP),R1
+	SWAB	R1
+	MOV	R1,4(SP)
+	RTS	PC
+
+NTOHS::	MOV	4(SP),R1
+	SWAB	R1
+	MOV	R1,2(SP)
+	RTS	PC
+
+	.END
