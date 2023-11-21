@@ -1,6 +1,6 @@
 ! Fix issues with DEQNA driver
 !
-! This fixes two errors in the loading of the multicast address list.
+! This fixes three errors in the handling of the multicast address list.
 !
 !  This is a Monitor patch, developed for V10.1; it might work on older versions.
 !
@@ -18,6 +18,10 @@ Offset address? 4574
  Base	Offset  Old     New?
 ??????	004574	012424	? 12524
 ??????	004576	077004	? ^Z
+Offset address? 11650
+ Base	Offset  Old     New?
+??????	011650	016402	? 116402
+??????	011652	000020	? ^Z
 Offset address? ^Z
 Base address? QNAPAT@OVR
 Offset address? 0
