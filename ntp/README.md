@@ -16,10 +16,9 @@ using the `broadcast` statement in the chrony.conf file.  I believe
 "ntpd" can also do this but I have not tested that.
 
 Please note:
-1. There appears to be a problem with the RSTS QNA driver; NTP does not
-receive anything on a QNA.
-2. NTP works on the UNA but it requires patches.  Be sure to install
-the patch in "patches/xedvr.cmd".
+
+Both RSTS Ethernet drivers have bugs that require patches.  Be sure to install
+the patch in `patches/xedvr.cmd` and/or `patches/xhdvr.cmd`.
 
 Contents:
 * ntp.c -- the main program.
@@ -33,7 +32,11 @@ Contents:
 ## Building
 
 You can use the prebuilt `ntp.tsk` but it's easy to build from source if you
-prefer.  You need DEC C for this.  To build, do `@build.com`.
+prefer.  You need DEC C for this.  To build, do `@build.com`.  Note that the
+code defaults to 60 Hz clock frequency.  To use a different value, supply the
+definition when compiling `tzutil.c`, for example:
+
+    cc /define="HERTZ 50" tzutil
 
 ## Installing
 
