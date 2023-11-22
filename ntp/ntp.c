@@ -8,6 +8,8 @@
 #include "tzutil.h"
 
 #define NOSUCH  5       /* Ethernet driver error code for "no packets pending" */
+#define DATERR  13      /* Some Ethernet packets were lost */
+#define MAGRLE  40      /* Oversized Ethernet packet */
 #define UU_DAT  -14     /* Date/Time changer */
 #define UU_DET  7       /* Detach */
 #define JFLOCK  040000  /* Lock in memory flag */
@@ -178,8 +180,11 @@ static void * getntppkt (int ch2, void *buf, int len)
         setxrb (buf, len);
         xrb->xrci = ch2;
         RSTS$READ ();
-        if (RSTS$FIRQB->firqb == NOSUCH) {
-            /* No packets pending */
+        /* Some errors are ignored: no packet pending, packets lost, oversized packet */
+        if (RSTS$FIRQB->firqb == NOSUCH ||
+            RSTS$FIRQB->firqb == DATERR ||
+            RSTS$FIRQB->firqb == MAGRLE) {
+            /* Report no packet */
             return NULL;
         }
         check ("ethernet receive");
